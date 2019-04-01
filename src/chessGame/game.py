@@ -1,5 +1,4 @@
 import pygame
-from pieces import Bishop
 from board import Board
 
 BOARD = pygame.transform.scale(
@@ -8,11 +7,10 @@ WIDTH = 800
 HEIGHT = 800
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
+board = Board()
 
 
 def redraw_gameWindow():
-    global win
-    global board
     win.blit(BOARD, (0, 0))
     board.draw(win)
 
@@ -29,14 +27,11 @@ def click(pos):
 
 
 def main():
-    global board
-    board = Board()
     clock = pygame.time.Clock()
     run = True
     while run:
-        clock.tick(10)
+        clock.tick(5)
         redraw_gameWindow()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

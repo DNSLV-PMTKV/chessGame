@@ -1,38 +1,17 @@
 import pygame
 
-b_pawn = pygame.image.load("../../img/black_pawn.png")
-b_rook = pygame.image.load("../../img/black_rook.png")
-b_knight = pygame.image.load("../../img/black_knight.png")
-b_bishop = pygame.image.load("../../img/black_bishop.png")
-b_queen = pygame.image.load("../../img/black_queen.png")
-b_king = pygame.image.load("../../img/black_king.png")
-
-w_pawn = pygame.image.load("../../img/white_pawn.png")
-w_rook = pygame.image.load("../../img/white_rook.png")
-w_knight = pygame.image.load("../../img/white_knight.png")
-w_bishop = pygame.image.load("../../img/white_bishop.png")
-w_queen = pygame.image.load("../../img/white_queen.png")
-w_king = pygame.image.load("../../img/white_king.png")
-
-
-b = [b_pawn, b_rook, b_knight, b_bishop, b_queen, b_king]
-w = [w_pawn, w_rook, w_knight, w_bishop, w_queen, w_king]
-
-b = [pygame.transform.scale(img, (80, 80)) for img in b]
-w = [pygame.transform.scale(img, (80, 80)) for img in w]
-
 
 class Piece:
     '''
     Every piece inherit from this class.
     '''
-    img = -1
 
     def __init__(self, name, position, color):
         self.name = name
         self.position = position
         self.color = color
         self.selected = False
+        self.move_list = []
 
     def __repr__(self):
         return self.name
@@ -41,40 +20,181 @@ class Piece:
         return self.name
 
     def draw(self, win):
-        # draw piece on the screen
-        if self.color == "white":
-            drawThis = w[self.img]
-        else:
-            drawThis = b[self.img]
-
-        x = self.position[1] + (self.position[1]*100) + 10
-        y = self.position[0] + (self.position[0]*100) + 10
+        '''
+        Draws pieces on the board.
+        '''
+        x = self.position[1] + (self.position[1]*100) + 5
+        y = self.position[0] + (self.position[0]*100) + 5
 
         if self.selected:
             pygame.draw.rect(win, (255, 0, 0), (x, y, 80, 80), 2)
 
-        win.blit(drawThis, (x, y))
+        win.blit(self.image, (x, y))
+
+    def draw_moves(self, win, board):
+        '''
+        Draws all possible moves of selected piece
+        '''
+        for position in self.available_moves(board):
+            x = position[0] + (position[0]*100) + 45
+            y = position[1] + (position[1]*100) + 45
+            # print(x, y)
+            pygame.draw.circle(win, (255, 0, 0), (x, y), 20, 20)
 
 
 class Pawn(Piece):
-    img = 0
+    def __init__(self, name, position, color):
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_pawn.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_pawn.png"), (80, 80))
+        self.first_move = True
+
+    def available_moves(self, board):
+        moves = []
+        # i - row
+        # j - col
+        i, j = self.position
+        if self.color == "white":
+            if i < 7:
+                if board[i-1][j] == 0:
+                    moves.append((j, i - 1))
+                    if self.first_move and board[i - 2][j] == 0:
+                        moves.append((j, i - 2))
+
+                if j < 7:
+                    if board[i - 1][j + 1] != 0 and board[i - 1][j + 1].color != self.color:
+                        moves.append((j + 1, i - 1))
+
+                if j > 0:
+                    if board[i - 1][j - 1] != 0 and board[i - 1][j - 1].color != self.color:
+                        moves.append((j - 1, i - 1))
+        else:
+            if i > 0:
+                if board[i+1][j] == 0:
+                    moves.append((j, i + 1))
+                    if self.first_move and board[i + 2][j] == 0:
+                        moves.append((j, i + 2))
+
+                if j < 7:
+                    if board[i + 1][j + 1] != 0 and board[i + 1][j + 1].color != self.color:
+                        moves.append((j + 1, i + 1))
+
+                if j > 0:
+                    if board[i + 1][j - 1] != 0 and board[i + 1][j - 1].color != self.color:
+                        moves.append((j - 1, i + 1))
+
+        return moves
 
 
 class Rook(Piece):
-    ig = 1
+    def __init__(self, name, position, color):
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_rook.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_rook.png"), (80, 80))
+
+    def available_moves(self, board):
+        moves = []
+        i, j = self.position
+        # forward
+        if i < 7:
+            for new_pos in range(i - 1, -1, -1):
+                if board[new_pos][j] != 0 and board[new_pos][j].color != self.color:
+                    moves.append((j, new_pos))
+                    break
+                moves.append((j, new_pos))
+         # left
+        if j < 7:
+            for new_pos in range(j - 1, -1, -1):
+                if board[i][new_pos] != 0 and board[i][new_pos].color != self.color:
+                    moves.append((new_pos, i))
+                    break
+                moves.append((new_pos, i))
+         # backward
+        if i > 0:
+            for new_pos in range(i + 1, 8):
+                if board[new_pos][j] != 0 and board[new_pos][j].color != self.color:
+                    moves.append((j, new_pos))
+                    break
+                moves.append((j, new_pos))
+         # right
+        if j > 0:
+            for new_pos in range(j + 1, 8):
+                if board[i][new_pos] != 0 and board[i][new_pos].color != self.color:
+                    moves.append((new_pos, i))
+                    break
+                moves.append((new_pos, i))
+
+        return moves
 
 
 class Knight(Piece):
-    img = 2
+    def __init__(self, name, position, color):
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_knight.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_knight.png"), (80, 80))
+
+    def available_moves(self, board):
+        moves = []
+        i, j = self.position
+        if i > 0:
+            if j > 0:
+                if board[i - 2][j - 1] == 0 or board[i - 2][j - 1].color != self.color:
+                    moves.append((j - 1, i - 2))
+
+                if board[i - 1][j - 2] == 0 or board[i - 1][j - 2].color != self.color:
+                    moves.append((j - 2, i - 1))
+
+            if j < 7:
+                if board[i - 2][j + 1] == 0 or board[i - 2][j - 1].color != self.color:
+                    moves.append((j + 1, i - 2))
+
+                if board[i - 1][j + 2] == 0 or board[i - 1][j - 2].color != self.color:
+                    moves.append((j + 2, i - 1))
+
+        return moves
 
 
 class Bishop(Piece):
-    img = 3
+    def __init__(self, name, position, color):
+
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_bishop.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_bishop.png"), (80, 80))
 
 
 class Queen(Piece):
-    img = 4
+    def __init__(self, name, position, color):
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_queen.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_queen.png"), (80, 80))
 
 
 class King(Piece):
-    img = 5
+    def __init__(self, name, position, color):
+        super().__init__(name, position, color)
+        if color == "white":
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/white_king.png"), (80, 80))
+        else:
+            self.image = pygame.transform.scale(
+                pygame.image.load("../../img/black_king.png"), (80, 80))
