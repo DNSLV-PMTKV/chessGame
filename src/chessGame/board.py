@@ -8,7 +8,8 @@ class Board:
 
         # black pawns
         for i in range(8):
-            self.board[1][i] = Pawn("BlackPawn{}".format(i+1), (1, i), "black")
+            self.board[1][i] = Pawn(
+                "BlackPawn{}".format(i + 1), (1, i), "black")
 
         # black pieces
         self.board[0][0] = Rook("BlackRookLeft", (0, 0), "black")
@@ -22,7 +23,8 @@ class Board:
 
         # white pawns
         for i in range(8):
-            self.board[6][i] = Pawn("WhitePawn{}".format(i+1), (6, i), "white")
+            self.board[6][i] = Pawn(
+                "WhitePawn{}".format(i + 1), (6, i), "white")
 
         # white pieces
         self.board[7][0] = Rook("WhiteRookLeft", (7, 0), "white")
@@ -34,8 +36,8 @@ class Board:
         self.board[7][6] = Knight("WhiteKnightRight", (7, 6), "white")
         self.board[7][7] = Rook("WhiteRookRight", (7, 7), "white")
 
-        self.board[2][6] = Knight("TestKnight", (2, 6), "white")
-        self.board[5][6] = Knight("TestKnight2", (5, 6), "black")
+        self.board[2][0] = King("TestQueen", (2, 0), "white")
+        self.board[4][7] = King("TestKnight2", (4, 7), "black")
 
         self.selected_piece = None
 
