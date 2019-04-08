@@ -14,10 +14,17 @@ class Piece:
         self.move_list = []
 
     def __repr__(self):
-        return self.name
+        return "{} @ {}".format(self.name, self.position)
 
     def __str__(self):
-        return self.name
+        return "{} @ {}".format(self.name, self.position)
+
+    def available_moves(self, board):
+        '''
+        Get all available moves of a piece.
+        Abstact function.
+        '''
+        pass
 
     def draw(self, win):
         '''
@@ -40,6 +47,12 @@ class Piece:
             y = position[1] + (position[1] * 100) + 45
             # print(x, y)
             pygame.draw.circle(win, (255, 0, 0), (x, y), 20, 20)
+
+    def change_position(self, position):
+        '''
+        Change the position of a piece on the board.
+        '''
+        self.position = position
 
 
 class Pawn(Piece):
@@ -112,7 +125,7 @@ class Rook(Piece):
                     moves.append((j, new_pos))
                     break
                 moves.append((j, new_pos))
-         # left
+        # left
         if j < 7:
             for new_pos in range(j - 1, -1, -1):
                 if board[i][new_pos] != 0 and board[i][new_pos].color == self.color:
@@ -121,7 +134,7 @@ class Rook(Piece):
                     moves.append((new_pos, i))
                     break
                 moves.append((new_pos, i))
-         # backward
+        # backward
         if i > 0:
             for new_pos in range(i + 1, 8):
                 if board[new_pos][j] != 0 and board[new_pos][j].color == self.color:
@@ -130,7 +143,7 @@ class Rook(Piece):
                     moves.append((j, new_pos))
                     break
                 moves.append((j, new_pos))
-         # right
+        # right
         if j > 0:
             for new_pos in range(j + 1, 8):
                 if board[i][new_pos] != 0 and board[i][new_pos].color == self.color:
@@ -224,7 +237,7 @@ class Bishop(Piece):
         # left down
         if i < 7 and j > 0:
             x, y = i, j
-            while x < 7 and y < 7:
+            while x < 7 and y > 0:
                 x += 1
                 y -= 1
                 if board[x][y] != 0 and board[x][y].color == self.color:
@@ -236,7 +249,7 @@ class Bishop(Piece):
         # right up
         if i > 0 and j < 7:
             x, y = i, j
-            while x < 7 and y < 7:
+            while x > 0 and y < 7:
                 x -= 1
                 y += 1
                 if board[x][y] != 0 and board[x][y].color == self.color:
@@ -248,7 +261,7 @@ class Bishop(Piece):
         # left up
         if i > 0 and j > 0:
             x, y = i, j
-            while x < 7 and y < 7:
+            while x > 0 and y > 0:
                 x -= 1
                 y -= 1
                 if board[x][y] != 0 and board[x][y].color == self.color:
@@ -318,7 +331,7 @@ class Queen(Piece):
                 moves.append((y, x))
             # up right
             x, y = i, j
-            while x < 7 and y < 7:
+            while x > 0 and y < 7:
                 x -= 1
                 y += 1
                 if board[x][y] != 0 and board[x][y].color == self.color:
@@ -378,7 +391,7 @@ class King(Piece):
     def available_moves(self, board):
         moves = []
         i, j = self.position
-        if i < 7:
+        if i > 0:
             # up
             if board[i - 1][j] == 0 or board[i - 1][j].color != self.color:
                 moves.append((j, i - 1))
@@ -394,7 +407,7 @@ class King(Piece):
                 if board[i - 1][j - 1] == 0 or board[i - 1][j - 1].color != self.color:
                     moves.append((j - 1, i - 1))
 
-        if i > 0:
+        if i < 7:
             # down
             if board[i + 1][j] == 0 or board[i + 1][j].color != self.color:
                 moves.append((j, i + 1))

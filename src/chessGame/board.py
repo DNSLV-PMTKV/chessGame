@@ -60,16 +60,35 @@ class Board:
         '''
         Select a piece on the board with coordinates (col, row).w
         '''
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j] != 0:
-                    self.board[i][j].selected = False
-
-        # Check if (col, row) is piece
-        if isinstance(self.board[row][col], Piece):
-            self.board[row][col].selected = True
+        if self.board[row][col] != 0:
             self.selected_piece = self.board[row][col]
         else:
             self.selected_piece = None
 
-        print(self.selected_piece)
+    def click(self, col, row):
+        if not self.selected_piece:
+            self.select(col, row)
+        if (cow, row) not in self.selected_piece.available_moves(self.board):
+            self.selected_piece = None
+        else:
+            self.move((row, col))
+
+    def move(self, pos):
+        '''
+        Move the selected piece from its position to another.
+        '''
+        test_board = self.board[:]
+        old = self.selected_piece.position
+
+        if isinstance(test_board[old[0]][old[1]], Pawn):
+            test_board[old[0]][old[1]].first_move = False
+
+        test_board[old[0]][old[1]].change_position(pos)
+        test_board[pos[0]][pos[1]] = test_board[old[0]][old[1]]
+        test_board[old[0]][old[1]] = 0
+
+        # print('{} moved.'.format(self.selected_piece))
+
+        self.board = test_board
+        self.selected_piece.selected = False
+        self.selected_piece = None
