@@ -33,8 +33,8 @@ class Piece:
         x = self.position[1] + (self.position[1] * 100) + 5
         y = self.position[0] + (self.position[0] * 100) + 5
 
-        if self.selected:
-            pygame.draw.rect(win, (255, 0, 0), (x, y, 80, 80), 2)
+        # if self.selected:
+            # pygame.draw.rect(win, (255, 0, 0), (x, y, 80, 80), 2)
 
         win.blit(self.image, (x, y))
 
@@ -188,22 +188,24 @@ class Knight(Piece):
                     moves.append((j + 2, i - 1))
 
         if i < 7:
-            # backward left
-            if j > 0:
-                if board[i + 2][j - 1] == 0 or board[i + 2][j - 1].color != self.color:
-                    moves.append((j - 1, i + 2))
-            # less backward more left
-            if j > 1:
-                if board[i + 1][j - 2] == 0 or board[i + 1][j - 2].color != self.color:
-                    moves.append((j - 2, i + 1))
-            # backward right
-            if j < 7:
-                if board[i + 2][j + 1] == 0 or board[i + 2][j + 1].color != self.color:
-                    moves.append((j + 1, i + 2))
             # less backward more right
             if j < 6:
                 if board[i + 1][j + 2] == 0 or board[i + 1][j + 2].color != self.color:
                     moves.append((j + 2, i + 1))
+            # less backward more left
+            if j > 1:
+                if board[i + 1][j - 2] == 0 or board[i + 1][j - 2].color != self.color:
+                    moves.append((j - 2, i + 1))
+        if i < 6:
+            # backward left
+            if j > 0:
+                if board[i + 2][j - 1] == 0 or board[i + 2][j - 1].color != self.color:
+                    moves.append((j - 1, i + 2))
+            # backward right
+            if j < 7:
+                if board[i + 2][j + 1] == 0 or board[i + 2][j + 1].color != self.color:
+                    moves.append((j + 1, i + 2))
+
 
         return moves
 

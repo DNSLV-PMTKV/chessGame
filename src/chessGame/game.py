@@ -39,7 +39,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos_on_click = pygame.mouse.get_pos()
                 i, j = click(mouse_pos_on_click)
-                board.select(i, j)
+                board.click(i, j)
 
 
 if __name__ == "__main__":

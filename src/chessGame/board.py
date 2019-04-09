@@ -36,10 +36,9 @@ class Board:
         self.board[7][6] = Knight("WhiteKnightRight", (7, 6), "white")
         self.board[7][7] = Rook("WhiteRookRight", (7, 7), "white")
 
-        self.board[2][0] = King("TestQueen", (2, 0), "white")
-        self.board[4][7] = King("TestKnight2", (4, 7), "black")
-
         self.selected_piece = None
+
+        self.turn = 'white'
 
     def draw(self, win):
         '''
@@ -56,22 +55,28 @@ class Board:
         if self.selected_piece:
             self.selected_piece.draw_moves(win, self.board)
 
-    def select(self, col, row):
+    def select(self, col, row, color):
         '''
-        Select a piece on the board with coordinates (col, row).w
+        Select a piece on the board with coordinates (col, row)
         '''
-        if self.board[row][col] != 0:
-            self.selected_piece = self.board[row][col]
-        else:
-            self.selected_piece = None
+        if self.board[row][col] != 0 and self.board[row][col].color == color:
+            if self.board[row][col] != 0:
+                self.selected_piece = self.board[row][col]
+                print(self.selected_piece)
+                print(self.selected_piece.available_moves(self.board))
+                # self.board[row][col].selected = True
+            else:
+                self.selected_piece = None
 
     def click(self, col, row):
+
         if not self.selected_piece:
-            self.select(col, row)
-        if (cow, row) not in self.selected_piece.available_moves(self.board):
-            self.selected_piece = None
+            self.select(col, row, self.turn)
         else:
-            self.move((row, col))
+            if (col, row) not in self.selected_piece.available_moves(self.board):
+                self.selected_piece = None
+            else:
+                self.move((row, col))
 
     def move(self, pos):
         '''
@@ -87,8 +92,35 @@ class Board:
         test_board[pos[0]][pos[1]] = test_board[old[0]][old[1]]
         test_board[old[0]][old[1]] = 0
 
-        # print('{} moved.'.format(self.selected_piece))
-
         self.board = test_board
-        self.selected_piece.selected = False
         self.selected_piece = None
+
+        if self.turn == 'white':
+            self.turn = 'black'
+        else:
+            self.turn = 'white'
+
+        if self.is_checked(self.turn):
+            print("{} KING CHECKED !!!".format(self.turn.upper()))
+
+    def danger(self, color):
+        danger = []
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j] != 0 and self.board[i][j].color != color:
+                    for move in self.board[i][j].available_moves(self.board):
+                        danger.append(move)
+        return danger
+
+    def is_checked(self, color):
+        '''
+        Return True if king is checked.
+        '''
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j] != 0 and self.board[i][j].color == color and isinstance(self.board[i][j], King):
+                    king_pos = (j, i)
+
+        if king_pos in self.danger(self.turn):
+            return True
+        return False
