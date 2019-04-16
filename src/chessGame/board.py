@@ -69,14 +69,14 @@ class Board:
                 self.selected_piece = None
 
     def click(self, col, row):
-
-        if not self.selected_piece:
-            self.select(col, row, self.turn)
-        else:
-            if (col, row) not in self.selected_piece.available_moves(self.board):
-                self.selected_piece = None
+        if col < 8 and row < 8:
+            if not self.selected_piece:
+                self.select(col, row, self.turn)
             else:
-                self.move((row, col))
+                if (col, row) not in self.selected_piece.available_moves(self.board):
+                    self.selected_piece = None
+                else:
+                    self.move((row, col))
 
     def move(self, pos):
         '''
