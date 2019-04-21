@@ -19,26 +19,19 @@ board = Board()
 
 
 def thread_client(conn):
-    data_string = pickle.dumps(board)
-    conn.send(data_string)
+    var = pickle.dumps(board)
+    conn.send(var)
     while True:
-        try:
-            data = conn.rect(8192*2)
-            data = data.decode()
-            if not data:
-                break
-            else:
-                if data.count('select') > 0:
-                    _all = data.split(' ')
-                    col = int(_all[1])
-                    row = int(_all[2])
-                    color = _all[3]
-                    board.click(col, row)
-        except Exception as e:
-            print(e)
+        data = conn.recv(1024)
+        # reply = data
+        if not data:
             break
+        print(data.decode())
+        conn.send(var)
+    conn.close()
 
 
+# print(pickle.dumps(board))
 while True:
     conn, addr = s.accept()
     print("Connected to: ", addr)

@@ -60,13 +60,12 @@ class Board:
         Select a piece on the board with coordinates (col, row)
         '''
         if self.board[row][col] != 0 and self.board[row][col].color == color:
-            if self.board[row][col] != 0:
-                self.selected_piece = self.board[row][col]
-                print(self.selected_piece)
-                print(self.selected_piece.available_moves(self.board))
-                # self.board[row][col].selected = True
-            else:
-                self.selected_piece = None
+            self.selected_piece = self.board[row][col]
+            print(self.selected_piece)
+            print(self.selected_piece.available_moves(self.board))
+            # self.board[row][col].selected = True
+        else:
+            self.selected_piece = None
 
     def click(self, col, row):
         if col < 8 and row < 8:

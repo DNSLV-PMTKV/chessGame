@@ -10,18 +10,17 @@ HEIGHT = 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 board = Board()
 pygame.font.init()
+
+
 # n = Network()
-
-
-def connect():
-    return n.board
+# n.print()
 
 
 def menu_screen():
     run = True
     while run:
         win.fill((128, 128, 128))
-        font = pygame.font.SysFont("Ubuntu", 80)
+        font = pygame.font.SysFont("comicsans", 80)
         title = font.render("Online Chess!", 1, (0, 200, 0))
         join = font.render("Click To Join a Game!", 1, (0, 128, 0))
         win.blit(title, (WIDTH/2 - title.get_width()/2, 200))
@@ -34,6 +33,13 @@ def menu_screen():
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
+
+    try:
+        n = Network()
+        board = n.board
+    except:
+        print("Server offline")
+
     main()
 
 
@@ -77,7 +83,8 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos_on_click = pygame.mouse.get_pos()
                 i, j = click(mouse_pos_on_click)
-                board.click(i, j)
+                n.send("select " + str(i) + " " + str(j) + " " + color)
+                # board.click(i, j)
 
     # menu_screen(win)
 
