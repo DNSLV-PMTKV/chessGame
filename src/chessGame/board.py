@@ -40,6 +40,8 @@ class Board:
 
         self.turn = 'white'
 
+        self.players = False
+
     def draw(self, win):
         '''
         Draws everything on the board(pieces, available moves)

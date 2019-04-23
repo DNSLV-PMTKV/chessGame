@@ -33,17 +33,19 @@ def menu_screen():
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
-
-    try:
-        n = Network()
-        board = n.board
-    except:
-        print("Server offline")
+    while True:
+        try:
+            global board, n
+            n = Network()
+            board = n.board
+            break
+        except:
+            print("Server offline")
 
     main()
 
 
-def redraw_gameWindow():
+def redraw_gameWindow(board, color):
     win.fill((128, 128, 128))
     win.blit(BOARD, (0, 0))
     board.draw(win)
@@ -51,12 +53,31 @@ def redraw_gameWindow():
     txt = font.render("Press q to Quit", 1, (255, 255, 255))
     win.blit(txt, (800, 765))
 
-    if board.turn == 'white':
-        txt3 = font.render("ON TURN: WHITE", 1, (0, 0, 0))
-        win.blit(txt3, (800, 400))
+    # if board.turn == 'white':
+    #     txt3 = font.render("ON TURN: WHITE", 1, (0, 0, 0))
+    #     win.blit(txt3, (800, 400))
+    # else:
+    #     txt3 = font.render("ON TURN: BLACK", 1, (0, 0, 0))
+    #     win.blit(txt3, (800, 400))
+    if not board.players:
+        font = pygame.font.SysFont("comicsans", 80)
+        txt = font.render("Waiting for Player", 1, (255, 0, 0))
+        win.blit(txt, (WIDTH/2 - txt.get_width()/2, 300))
+
+    font = pygame.font.SysFont("comicsans", 30)
+    if color == "white":
+        txt3 = font.render("YOU ARE WHITE", 1, (255, 0, 0))
+        win.blit(txt3, (WIDTH / 2 - txt3.get_width() / 2, 10))
     else:
-        txt3 = font.render("ON TURN: BLACK", 1, (0, 0, 0))
-        win.blit(txt3, (800, 400))
+        txt3 = font.render("YOU ARE BLACK", 1, (255, 0, 0))
+        win.blit(txt3, (WIDTH / 2 - txt3.get_width() / 2, 10))
+
+    if board.turn == color:
+        txt3 = font.render("YOUR TURN", 1, (255, 0, 0))
+        win.blit(txt3, (WIDTH / 2 - txt3.get_width() / 2, 700))
+    else:
+        txt3 = font.render("THEIR TURN", 1, (255, 0, 0))
+        win.blit(txt3, (WIDTH / 2 - txt3.get_width() / 2, 700))
 
     pygame.display.update()
 
@@ -71,20 +92,31 @@ def click(pos):
 
 
 def main():
+    global board, n
+    color = board.start_user
     clock = pygame.time.Clock()
+    print(color)
+    print(board.players)
+    count = 0
     run = True
+
     while run:
         clock.tick(5)
-        redraw_gameWindow()
+        if count == 5:
+            board = n.send("get")
+            count = 0
+        else:
+            count += 1
+        redraw_gameWindow(board, color)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos_on_click = pygame.mouse.get_pos()
-                i, j = click(mouse_pos_on_click)
-                n.send("select " + str(i) + " " + str(j) + " " + color)
-                # board.click(i, j)
+            if event.type == pygame.MOUSEBUTTONUP:
+                if color == board.turn and board.players:
+                    mouse_pos_on_click = pygame.mouse.get_pos()
+                    i, j = click(mouse_pos_on_click)
+                    board = n.send("select {} {}".format(i, j))
 
     # menu_screen(win)
 
