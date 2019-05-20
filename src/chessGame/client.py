@@ -13,7 +13,7 @@ class Network:
 
     def connect(self):
         self.client.connect(self.addr)
-        return self.client.recv(8192*2)
+        return self.client.recv(8192 * 2)
 
     def disconnect(self):
         self.client.close()
@@ -24,7 +24,7 @@ class Network:
                 self.client.send(pickle.dumps(data))
             else:
                 self.client.send(str.encode(data))
-            reply = self.client.recv(4096*4)
+            reply = self.client.recv(4096 * 4)
             try:
                 reply = pickle.loads(reply)
             except Exception as e:

@@ -42,6 +42,8 @@ class Board:
 
         self.players = False
 
+        self.winner = None
+
     def draw(self, win):
         '''
         Draws everything on the board(pieces, available moves)
@@ -83,23 +85,34 @@ class Board:
         '''
         Move the selected piece from its position to another.
         '''
+        move = True
+        checkedBefore = self.is_checked(self.turn)
         test_board = self.board[:]
-        old = self.selected_piece.position
+        old = self.selected_piece
+        old_pos = self.selected_piece.position
 
-        if isinstance(test_board[old[0]][old[1]], Pawn):
-            test_board[old[0]][old[1]].first_move = False
+        if isinstance(test_board[old_pos[0]][old_pos[1]], Pawn):
+            test_board[old_pos[0]][old_pos[1]].first_move = False
 
-        test_board[old[0]][old[1]].change_position(pos)
-        test_board[pos[0]][pos[1]] = test_board[old[0]][old[1]]
-        test_board[old[0]][old[1]] = 0
+        test_board[old_pos[0]][old_pos[1]].change_position(pos)
+        test_board[pos[0]][pos[1]] = test_board[old_pos[0]][old_pos[1]]
+        test_board[old_pos[0]][old_pos[1]] = 0
 
         self.board = test_board
         self.selected_piece = None
 
-        if self.turn == 'white':
-            self.turn = 'black'
-        else:
-            self.turn = 'white'
+        if self.is_checked(self.turn) or (checkedBefore and self.is_checked(self.turn)):
+            move = False
+            test_board[pos[0]][pos[1]].change_position(old_pos)
+            test_board[old_pos[0]][old_pos[1]] = test_board[pos[0]][pos[1]]
+            test_board[pos[0]][pos[1]] = old
+            self.board = test_board
+
+        if move:
+            if self.turn == 'white':
+                self.turn = 'black'
+            else:
+                self.turn = 'white'
 
         if self.is_checked(self.turn):
             print("{} KING CHECKED !!!".format(self.turn.upper()))
@@ -117,6 +130,7 @@ class Board:
         '''
         Return True if king is checked.
         '''
+        king_pos = None
         for i in range(8):
             for j in range(8):
                 if self.board[i][j] != 0 and self.board[i][j].color == color and isinstance(self.board[i][j], King):
@@ -124,4 +138,21 @@ class Board:
 
         if king_pos in self.danger(self.turn):
             return True
+        return False
+
+    def check_mate(self, color):
+        if self.is_checked(color):
+            king = None
+            for i in range(8):
+                for j in range(8):
+                    if self.board[i][j] != 0 and self.board[i][j].color == color and isinstance(self.board[i][j], King):
+                        king = self.board[i][j]
+            if king is not None:
+                valid_moves = king.available_moves(self.board)
+                danger_moves = self.danger(color)
+                danger_count = 0
+                for move in valid_moves:
+                    if move in danger_moves:
+                        danger_count += 1
+                return danger_count == len(valid_moves)
         return False

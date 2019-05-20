@@ -39,12 +39,20 @@ def thread_client(conn):
 
     while True:
         data = conn.recv(1024)
+        data = data.decode()
+        data_split = data.split()
         if not data:
             break
-        data = data.decode().split()
+        # data = data.decode().split()
         print(data)
-        if 'select' in data:
-            board.click(int(data[1]), int(data[2]))
+        if 'select' in data_split:
+            board.click(int(data_split[1]), int(data_split[2]))
+
+        if data == 'winner b':
+            board.winner = 'black'
+        if data == 'winner w':
+            board.winner = 'white'
+
         sendData = pickle.dumps(board)
         # print("Sending {}".format(sendData))
         conn.sendall(sendData)
