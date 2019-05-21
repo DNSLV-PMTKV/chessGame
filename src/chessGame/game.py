@@ -1,19 +1,29 @@
 import pygame
+import os
 from board import Board
 from client import Network
 
+absFilePath = os.path.abspath(__file__)
+fileDir = os.path.dirname(os.path.abspath(__file__))
+parentDir = os.path.dirname(fileDir)
+
+ROOT_DIR = os.path.dirname(parentDir)
+IMG_DIR = os.path.join(ROOT_DIR, 'img')
+
+board_img = os.path.join(IMG_DIR, 'board.png')
+icon_img = os.path.join(IMG_DIR, 'chess_icon.ico')
+
 BOARD = pygame.transform.scale(
-    pygame.image.load('../../img/board.png'), (800, 800))
+    pygame.image.load(board_img), (800, 800))
 WIDTH = 1000
 HEIGHT = 800
-
 win = pygame.display.set_mode((WIDTH, HEIGHT))
+icon = pygame.image.load(icon_img)
+pygame.display.set_icon(icon)
+pygame.display.set_caption("Chess Game")
+
 board = Board()
 pygame.font.init()
-
-
-# n = Network()
-# n.print()
 
 
 def menu_screen():
@@ -21,10 +31,13 @@ def menu_screen():
     while run:
         win.fill((128, 128, 128))
         font = pygame.font.SysFont("comicsans", 80)
-        title = font.render("Online Chess!", 1, (0, 200, 0))
+        title = font.render("Chess Game!", 1, (0, 200, 0))
         join = font.render("Click To Join a Game!", 1, (0, 128, 0))
+        font2 = pygame.font.SysFont("comicsans", 20)
+        made_by = font2.render("Made by DNSLV-PMTKV", 1, (0, 0, 0))
         win.blit(title, (WIDTH / 2 - title.get_width() / 2, 200))
         win.blit(join, (WIDTH / 2 - join.get_width() / 2, 400))
+        win.blit(made_by, (825, 775))
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -80,7 +93,7 @@ def redraw_gameWindow(board, color):
     if not board.players:
         font = pygame.font.SysFont("comicsans", 80)
         txt = font.render("Waiting for Player", 1, (255, 0, 0))
-        win.blit(txt, (WIDTH / 2 - txt.get_width() / 2, 300))
+        win.blit(txt, (400 - txt.get_width() / 2, 350))
 
     font = pygame.font.SysFont("comicsans", 30)
     if color == "white":
